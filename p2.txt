@@ -1,0 +1,36 @@
+.TH  Project 2
+.SH Name
+P2: POSIX Standards & Layering
+.SH Synopsis
+The goal of this project was to familiarize ourselves with the process of memory management. This was done by implementing a memory manager in c++ on reptilian that was responsible for allocating, deallocating, and combining blocks to keep memory clean. 
+.SH Description of Functions
+.TP
+.B MemoryManager(unsigned wordSize, std::function<int(int, void *)> allocator)
+Sets all the values for my MemoryManager object such as the head pointer and the size of the memory.
+.TP
+.B ~MemoryManager() / void shutdown()
+Shutdown goes through my entire list of blocks and deletes them one by one. Then is deletes the actually memory array as well and sets them to nullptr.
+.TP
+.B void initialize(size_t sizeInWords)
+Checks to make sure the sizeInWords is valid. If so then we create our first block of size sizeInWords and set the head equal to that block. We also initialize the memory array to the same sizeInWords and fill it all with 0s.
+.TP
+.B void *allocate(size_t sizeInBytes)
+Gets the offset of the block to allocate to. Adds 1s to memory array for that block and splits current block if needed.
+.TP
+.B void free(void *address)
+Gets address of memory location and matches it to block. Then deletes that block and adds 0s to array. If necessary, the block will combine with neighboring free blocks. 
+.TP
+.B int dumpMemoryMap(char *filename);
+Used standard POSIX calls open(aka "creat"), write, and close to write out a map of holes in my memory. I used the blocks and checked if the current one was free. If so I would write the needed data to the buffer and then to the file. Next we clear the buffer and move to next block until current is nullptr.
+.TP
+.B void *getList();
+Similar algorithm to dumpMemoryMap as we start with head block and iterate until we find next free block. When found we increment the hole count and add the offset and length of that block to the list. When current block is nullptr we return the list. 
+.TP
+.B void *getBitmap();
+Creates a empty bitstring and starts with the head block. Goes block by block for the length of the block adding 1s if the block is used and 0s if it is free. This bitstring then gets split into its respective bytes. We get the size of the bitmap store that in the first two bytes of our list and then add the rest of the bitmap to the list and return.
+.SH Testing
+Testing was done using the given CommandLineTest.cpp and the GDB debugger. Valgrind was used to check for memory leaks.
+.SH LINK
+https://youtu.be/zhTXhiZrDrU
+.SH Author
+Michael Shapiro
